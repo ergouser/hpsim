@@ -297,7 +297,7 @@ static PyObject* GetDbEPICS(PyObject* self, PyObject* args)
       {
         std::string value_str;
         value_str = value_trpl[0];
-        return PyString_FromString(value_str.c_str());
+        return PyUnicode_FromString(value_str.c_str());
       }
     }// for dbs_indx
     std::cerr << "Error in get_db_epics : can't find pv: " << pv_name << ", or this record has a NULL value " << std::endl;  
@@ -349,7 +349,7 @@ static PyObject* GetDbModel(PyObject* self, PyObject* args)
             " where name = '" + std::string(record_name) + "'";
           std::string value_str = GetDataFromDB(dbconn->db_conn, sql.c_str());
           if(value_str != "")
-            return PyString_FromString(value_str.c_str());            
+            return PyUnicode_FromString(value_str.c_str());            
           else
             saindx++;
         }
@@ -388,7 +388,7 @@ static PyObject* GetElementList(PyObject* self, PyObject* args, PyObject* kwds)
     {
       PyObject* elem_lst = PyList_New(names.size());
       for(int i = 0; i < names.size(); ++i)
-        PyList_SetItem(elem_lst, i, PyString_FromString(names[i].c_str()));
+        PyList_SetItem(elem_lst, i, PyUnicode_FromString(names[i].c_str()));
       return elem_lst;
     }
   }
@@ -407,15 +407,32 @@ static PyMethodDef HPSimModuleMethods[]={
   {NULL}
 };
 
-PyMODINIT_FUNC initHPSim()
+static struct PyModuleDef cModPyDem =
 {
-  PyObject* module = Py_InitModule("HPSim", HPSimModuleMethods);
+    PyModuleDef_HEAD_INIT,
+    "HPSim", /* name of module */
+    "",          /* module documentation, may be NULL */
+    -1,          /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+    HPSimModuleMethods
+};
+
+//PyMODINIT_FUNC initHPSim()
+PyMODINIT_FUNC PyInit_HPSim()
+{
+  Py_Initialize();
+  PyObject* module = PyModule_Create(&cModPyDem);
+ if (module == NULL)
+        return NULL;
+  //PyObject* module = Py_InitModule("HPSim", HPSimModuleMethods);
+  
   import_array();
+ 
   initBeam(module);
   initDBConnection(module);
   initBeamLine(module);
   initSimulator(module);
   initSpaceCharge(module);
+  return module;
 }
 
 PyObject* getHPSimType(char* name)

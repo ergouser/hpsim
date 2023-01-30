@@ -57,7 +57,7 @@ static void SimulatorDel(CPPClassObject* self)
 {
   SimulationEngine* engine = (SimulationEngine*)(self->cpp_obj);
   delete engine;
-  self->ob_type->tp_free((PyObject*) self);
+  Py_TYPE(&self)->tp_free((PyObject*) self);
 }
 
 PyDoc_STRVAR(reset__doc__,
@@ -132,8 +132,7 @@ static PyMemberDef SimulatorMembers[] = {
 };
 
 static PyTypeObject Simulator_Type = {
-    PyObject_HEAD_INIT(NULL)
-    0, /*ob_size*/
+         PyVarObject_HEAD_INIT(NULL, 0)
     "Simulator", /*tp_name*/
     sizeof(CPPClassObject), /*tp_basicsize*/
     0, /*tp_itemsize*/
@@ -170,16 +169,15 @@ static PyTypeObject Simulator_Type = {
     0, /* tp_dictoffset */
     (initproc) SimulatorInit, /* tp_init */
     0, /* tp_alloc */
-    SimulatorNew, /* tp_new */
+    (newfunc)SimulatorNew, /* tp_new */
 };
 
 PyMODINIT_FUNC initSimulator(PyObject* module)
 {
-  if(PyType_Ready(&Simulator_Type) < 0) return;
+  if(PyType_Ready(&Simulator_Type) < 0) return NULL;
   Py_INCREF(&Simulator_Type);
   PyModule_AddObject(module, "Simulator", (PyObject*)&Simulator_Type);
 }
-
 
 #ifdef _cplusplus
 }

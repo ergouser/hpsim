@@ -6,12 +6,12 @@ import sys
 import os
 # define directory to packages and append to $PATH
 par_dir = os.path.abspath(os.path.pardir)
-print par_dir
+print(par_dir)
 lib_dir = os.path.join(par_dir,"bin")
-print lib_dir
+print(lib_dir)
 sys.path.append(lib_dir)
 pkg_dir = os.path.join(par_dir,"pylib")
-print pkg_dir
+print(pkg_dir)
 sys.path.append(pkg_dir)
 
 #import additional python packages
@@ -35,13 +35,13 @@ dbs = ['tbtd.db','dtl.db','trst.db','ccl.db']
 dbconn1 = hps.DBConnection(db_dir, dbs, lib_dir, 'libsqliteext.so')
 dbconn1.print_dbs()
 dbconn1.clear_model_index()
-print "*** dB connection established ***"
+print("*** dB connection established ***")
 
 ################################################################################
 # create beamline
 bl = hps.BeamLine()
 beamline = hps.get_element_list()
-print "*** Beamline created ***"
+print("*** Beamline created ***")
 
 ################################################################################
 # create H- beam
@@ -55,26 +55,26 @@ beam.set_ref_w(0.750)
 beam.set_ref_phi(phi_offset)
 beam.translate('phi', phi_offset)
 beam.save_initial_beam()
-print "*** H- Beam created ***"
+print("*** H- Beam created ***")
 
 ################################################################################
 # create spacecharge
 spch = hps.SpaceCharge(nr = 32, nz = 128, interval = 0.025, adj_bunch = 3)
-print "spch interval=", spch.get_interval()
-print "adj_bunch=", spch.get_adj_bunch()
+print("spch interval=", spch.get_interval())
+print("adj_bunch=", spch.get_adj_bunch())
 # define at what energy simulation stops using adjacent bunches in SC calc
 spch.set_adj_bunch_cutoff_w(0.8)
 # remeshing factor determines how ofter the mesh gets recalc vs scaled for SC kick
 #spch.set_remesh_threshold(0.02)
 spch.set_remesh_threshold(0.2)
-print "cutoff w=", spch.get_adj_bunch_cutoff_w()
-print "*** Space Charge Initialized ***"
+print("cutoff w=", spch.get_adj_bunch_cutoff_w())
+print("*** Space Charge Initialized ***")
 
 ################################################################################
 # create simulator
 sim = hps.Simulator(beam)
 sim.set_space_charge('on')
-print "*** Simulator Initialized ***"
+print("*** Simulator Initialized ***")
 
 ################################################################################
 # STANDARD AND REQUIRED STUFF ABOVE THIS LINE
@@ -112,7 +112,7 @@ elif PV_TYPE == 'AMP':
     PV_MAX = PV_INIT_VAL * (1.0 + D_PV/100.)
     STEP_SIZE = 2.5 #percent of initial value
     PV_STEP = STEP_SIZE/100.0 * PV_INIT_VAL
-    print np.arange(PV_MIN, PV_MAX, PV_STEP)
+    print(np.arange(PV_MIN, PV_MAX, PV_STEP))
 
 elif PV_TYPE == 'OTHER':
     PV_INIT_VAL = hps.get_db_epics(EPICS_PV)
@@ -123,13 +123,13 @@ elif PV_TYPE == 'OTHER':
 
 elif PV_TYPE == None:
     EPICS_PV = None
-    print PV_TYPE
+    print(PV_TYPE)
 
 else:
-    print 'Error with pv_type'
+    print('Error with pv_type')
     exit()
 
-print '{0} starting value is {1}'.format(EPICS_PV, PV_INIT_VAL)
+print('{0} starting value is {1}'.format(EPICS_PV, PV_INIT_VAL))
 
 try: #use try to allow graceful exit if simulation crashes, so that PV is restored to init val
     plt.ion() #interactive mode ON
@@ -140,7 +140,7 @@ try: #use try to allow graceful exit if simulation crashes, so that PV is restor
     for val in np.arange(PV_MIN, PV_MAX, PV_STEP):
         beam.restore_initial_beam()
         hps.set_db_epics(EPICS_PV, val)
-        print EPICS_PV, "is now", hps.get_db_epics(EPICS_PV)
+        print(EPICS_PV, "is now", hps.get_db_epics(EPICS_PV))
     # simulate here
         sim.simulate(SIM_START, SIM_STOP)
         
@@ -177,18 +177,18 @@ try: #use try to allow graceful exit if simulation crashes, so that PV is restor
                 plot.title(title)
                 plot.draw()
             except:
-                print " Warning - No output for PV at this value"
+                print(" Warning - No output for PV at this value")
 finally:
     plt.ioff()
     hps.set_db_epics(EPICS_PV, PV_INIT_VAL)
-    print '{0} restore to original value {1}'.format(EPICS_PV, PV_INIT_VAL)
+    print('{0} restore to original value {1}'.format(EPICS_PV, PV_INIT_VAL))
 
     # print results
     for item in output:
-        print item
+        print(item)
 
 # plot output list quantities
-    pv_val, npart, wout, sig_w, avg_phi, sig_phi = zip(*output)
+    pv_val, npart, wout, sig_w, avg_phi, sig_phi = list(zip(*output))
         
     fig2 = plt.figure()
     title = "H{0} from {1} to {2}; scan of {3} {4}".format(\

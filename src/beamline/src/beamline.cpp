@@ -68,7 +68,8 @@ void BeamLine::Print(std::string r_start, std::string r_end) const
  * \callgraph
  */
 uint BeamLine::GetElementModelIndex(std::string r_name) const 
-  throw(BeamLineElementNotFoundException)
+      throw()
+//  throw(BeamLineElementNotFoundException)
 {
   for(uint i = 0; i < bl.size(); ++i)
     if (StringEqualCaseInsensitive(bl[i]->GetName(), r_name))

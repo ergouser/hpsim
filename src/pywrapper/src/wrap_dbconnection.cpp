@@ -9,7 +9,8 @@ extern "C" {
 
 static PyObject* DBConnectionNew(PyTypeObject* type, PyObject* args, PyObject* kwds)
 {
-  CPPClassObject* self = (CPPClassObject*)(type->tp_alloc(type, 0));
+     std::cerr << "DBConnectionNew"<< std::endl;
+ CPPClassObject* self = (CPPClassObject*)(type->tp_alloc(type, 0));
   self->cpp_obj = NULL;
   return (PyObject*) self;
 }
@@ -34,7 +35,8 @@ static int DBConnectionInit(CPPClassObject* self, PyObject* args, PyObject* kwds
 static void DBConnectionDel(CPPClassObject* self)
 {
   delete (DBConnection*)(self->cpp_obj);
-  self->ob_type->tp_free((PyObject*) self);
+  Py_TYPE(&self)->tp_free((PyObject*) self);
+  //self->ob_type->tp_free((PyObject*) self);
 }
 
 PyDoc_STRVAR(load_lib__doc__,
@@ -82,6 +84,7 @@ PyDoc_STRVAR(print_dbs__doc__,
 static PyObject* DBConnectionPrintDBs(PyObject* self, PyObject* args)
 {
   CPPClassObject* cppclass_obj = (CPPClassObject*)self;
+  fprintf (stderr,  "cppclass_obj %x cppclass_obj->cpp_obj %x args %x \n",cppclass_obj, cppclass_obj->cpp_obj, args);
   DBConnection* dbconn = (DBConnection*)(cppclass_obj->cpp_obj); 
   if(!PyArg_ParseTuple(args, ""))
     return NULL;
@@ -135,7 +138,7 @@ static PyObject* DBConnectionGetEPICSChannels(PyObject* self, PyObject* args)
     return NULL;
   PyObject* pv_lst = PyList_New(pvs.size());
   for(int i = 0; i < pvs.size(); ++i)
-    PyList_SetItem(pv_lst, i, PyString_FromString(pvs[i].c_str())); 
+    PyList_SetItem(pv_lst, i, PyUnicode_FromString(pvs[i].c_str())); 
   return pv_lst;
 }
 static PyMethodDef DBConnectionMethods[] = {
@@ -153,8 +156,9 @@ static PyMemberDef DBConnectionMembers[] = {
 };
 
 static PyTypeObject DBConnection_Type = {
-    PyObject_HEAD_INIT(NULL)
-    0, /*ob_size*/
+        PyVarObject_HEAD_INIT(NULL, 0)
+    //PyObject_HEAD_INIT(NULL)
+    //0, /*ob_size*/
     "DBConnection", /*tp_name*/
     sizeof(CPPClassObject), /*tp_basicsize*/
     0, /*tp_itemsize*/
@@ -194,9 +198,16 @@ static PyTypeObject DBConnection_Type = {
     DBConnectionNew, /* tp_new */
 };
 
+// PyMODINIT_FUNC initDBConnection(PyObject* module)
+// {
+//   if(PyType_Ready(&DBConnection_Type) < 0) return NULL;
+//   CPPClassObject *base = PyObject_New(CPPClassObject, &DBConnection_Type);
+//   Py_INCREF(base);
+//   PyModule_AddObject(module, "DBConnection", (PyObject*)base);
+// }
 PyMODINIT_FUNC initDBConnection(PyObject* module)
 {
-  if(PyType_Ready(&DBConnection_Type) < 0) return;
+  if(PyType_Ready(&DBConnection_Type) < 0) return NULL;
   Py_INCREF(&DBConnection_Type);
   PyModule_AddObject(module, "DBConnection", (PyObject*)&DBConnection_Type);
 }

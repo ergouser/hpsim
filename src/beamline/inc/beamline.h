@@ -15,7 +15,8 @@ struct BeamLine : public PyWrapper
   void AddElement(BeamLineElement*);
   uint GetSize() const;
   uint GetElementModelIndex(std::string) const 
-      throw(BeamLineElementNotFoundException);
+      throw();
+ //     throw(BeamLineElementNotFoundException);
   std::string GetElementName(uint) const;
   std::vector<std::string> GetElementNames(std::string r_begin = "", 
       std::string r_end = "", std::string r_type = "") const;

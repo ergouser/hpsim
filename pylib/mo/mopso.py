@@ -2,7 +2,7 @@
 
 import random, math, copy
 from .individual import *
-import config
+from . import config
 
 class mopso:
     '''
@@ -57,7 +57,7 @@ class mopso:
           
     def run(self, num_generation):
       if config.eval_func == '':
-	print 'Error from MOPSO: No evaluation function is provided!'
+	print('Error from MOPSO: No evaluation function is provided!')
 	exit()
       self.update_archive()
       for g in range(num_generation):
@@ -141,7 +141,7 @@ class mopso:
               range_start = int(len(self.archive)*0.9);
               if range_start == self.archive_size-1:
                 range_start = 0
-              replace_index = random.choice(range(range_start, self.archive_size-1))
+              replace_index = random.choice(list(range(range_start, self.archive_size-1)))
               a = self.archive[replace_index]
 #              print "!!!archive full start = " + str(range_start)
 #              print "!!!archive full! replace: " + str(a.objectives) + str(a.variables) + str(a.constraint_violation)

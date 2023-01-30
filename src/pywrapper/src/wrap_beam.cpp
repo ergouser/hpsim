@@ -52,7 +52,8 @@ static int BeamInit(CPPClassObject* self, PyObject* args, PyObject* kwds)
 static void BeamDel(CPPClassObject* self)
 {
   delete (Beam*)(self->cpp_obj);
-  self->ob_type->tp_free((PyObject*) self);
+  Py_TYPE(&self)->tp_free((PyObject*) self);
+  //self->ob_type->tp_free((PyObject*) self);
 }
 
 PyDoc_STRVAR(set_distribution__doc__,
@@ -102,14 +103,14 @@ static PyObject* BeamSetDistribution(PyObject* self, PyObject* args)
   {
     loss_c.resize(len, 0);
     for(int i = 0; i < PyList_Size(x); ++i) 
-      loss_c[i] = (uint) PyInt_AsLong(PyList_GetItem(loss, i)); 
+      loss_c[i] = (uint) PyLong_AsLong(PyList_GetItem(loss, i)); 
     loss_ptr = &loss_c;
   }
   if(lloss != NULL)
   {
     lloss_c.resize(len, 0);
     for(int i = 0; i < PyList_Size(x); ++i) 
-      lloss_c[i] = (uint) PyInt_AsLong(PyList_GetItem(loss, i)); 
+      lloss_c[i] = (uint) PyLong_AsLong(PyList_GetItem(loss, i)); 
     lloss_ptr = &lloss_c;
   }
   beam->InitBeamFromDistribution(x_c, xp_c, y_c, yp_c, phi_c, w_c, loss_ptr, lloss_ptr);
@@ -464,12 +465,12 @@ static PyObject* BeamGetX(PyObject* self, PyObject* args)
   else 
     arr_sz = loss_num;
 
-  int dim[1];
+  npy_intp dim[1];
   dim[0] = arr_sz;
-  PyArrayObject* lst = (PyArrayObject*)PyArray_FromDims(1, dim, NPY_DOUBLE);
+  PyArrayObject* lst = (PyArrayObject*)PyArray_SimpleNew(1, dim, NPY_DOUBLE);
   if(lst == NULL)
   {
-    std::cerr << "Beam::get_x() error: PyArray_FromDims() failed to create a numpy array!" << std::endl;
+    std::cerr << "Beam::get_x() error: PyArray_SimpleNew() failed to create a numpy array!" << std::endl;
     return NULL;
   }
   
@@ -532,12 +533,12 @@ static PyObject* BeamGetXp(PyObject* self, PyObject* args)
   else 
     arr_sz = loss_num;
 
-  int dim[1];
+  npy_intp dim[1];
   dim[0] = arr_sz;
-  PyArrayObject* lst = (PyArrayObject*)PyArray_FromDims(1, dim, NPY_DOUBLE);
+  PyArrayObject* lst = (PyArrayObject*)PyArray_SimpleNew(1, dim, NPY_DOUBLE);
   if(lst == NULL)
   {
-    std::cerr << "Beam::get_xp() error: PyArray_FromDims() failed to create a numpy array!" << std::endl;
+    std::cerr << "Beam::get_xp() error: PyArray_SimpleNew() failed to create a numpy array!" << std::endl;
     return NULL;
   }
   
@@ -600,12 +601,12 @@ static PyObject* BeamGetY(PyObject* self, PyObject* args)
   else 
     arr_sz = loss_num;
 
-  int dim[1];
+  npy_intp dim[1];
   dim[0] = arr_sz;
-  PyArrayObject* lst = (PyArrayObject*)PyArray_FromDims(1, dim, NPY_DOUBLE);
+  PyArrayObject* lst = (PyArrayObject*)PyArray_SimpleNew(1, dim, NPY_DOUBLE);
   if(lst == NULL)
   {
-    std::cerr << "Beam::get_y() error: PyArray_FromDims() failed to create a numpy array!" << std::endl;
+    std::cerr << "Beam::get_y() error: PyArray_SimpleNew() failed to create a numpy array!" << std::endl;
     return NULL;
   }
   
@@ -668,12 +669,12 @@ static PyObject* BeamGetYp(PyObject* self, PyObject* args)
   else 
     arr_sz = loss_num;
 
-  int dim[1];
+  npy_intp dim[1];
   dim[0] = arr_sz;
-  PyArrayObject* lst = (PyArrayObject*)PyArray_FromDims(1, dim, NPY_DOUBLE);
+  PyArrayObject* lst = (PyArrayObject*)PyArray_SimpleNew(1, dim, NPY_DOUBLE);
   if(lst == NULL)
   {
-    std::cerr << "Beam::get_yp() error: PyArray_FromDims() failed to create a numpy array!" << std::endl;
+    std::cerr << "Beam::get_yp() error: PyArray_SimpleNew() failed to create a numpy array!" << std::endl;
     return NULL;
   }
   
@@ -745,12 +746,12 @@ static PyObject* BeamGetPhi(PyObject* self, PyObject* args)
     arr_sz = all_num - loss_num;
   else 
     arr_sz = loss_num;
-  int dim[1];
+  npy_intp dim[1];
   dim[0] = arr_sz;
-  PyArrayObject* lst = (PyArrayObject*)PyArray_FromDims(1, dim, NPY_DOUBLE);
+  PyArrayObject* lst = (PyArrayObject*)PyArray_SimpleNew(1, dim, NPY_DOUBLE);
   if(lst == NULL)
   {
-    std::cerr << "Beam::get_phi() error: PyArray_FromDims() failed to create a numpy array!" << std::endl;
+    std::cerr << "Beam::get_phi() error: PyArray_SimpleNew() failed to create a numpy array!" << std::endl;
     return NULL;
   }
   
@@ -824,12 +825,12 @@ static PyObject* BeamGetW(PyObject* self, PyObject* args)
   else 
     arr_sz = loss_num;
 
-  int dim[1];
+  npy_intp dim[1];
   dim[0] = arr_sz;
-  PyArrayObject* lst = (PyArrayObject*)PyArray_FromDims(1, dim, NPY_DOUBLE);
+  PyArrayObject* lst = (PyArrayObject*)PyArray_SimpleNew(1, dim, NPY_DOUBLE);
   if(lst == NULL)
   {
-    std::cerr << "Beam::get_w() error: PyArray_FromDims() failed to create a numpy array!" << std::endl;
+    std::cerr << "Beam::get_w() error: PyArray_SimpleNew() failed to create a numpy array!" << std::endl;
     return NULL;
   }
   
@@ -882,12 +883,12 @@ static PyObject* BeamGetLoss(PyObject* self, PyObject* args)
   CPPClassObject* cppclass_obj = (CPPClassObject*)self;
   Beam* beam = (Beam*)(cppclass_obj->cpp_obj); 
   uint arr_sz = beam->num_particle;
-  int dim[1];
+  npy_intp dim[1];
   dim[0] = arr_sz;
-  PyArrayObject* lst = (PyArrayObject*)PyArray_FromDims(1, dim, NPY_UINT);
+  PyArrayObject* lst = (PyArrayObject*)PyArray_SimpleNew(1, dim, NPY_UINT);
   if(lst == NULL)
   {
-    std::cerr << "Beam::get_losses() error: PyArray_FromDims() failed to create a numpy array!" << std::endl;
+    std::cerr << "Beam::get_losses() error: PyArray_SimpleNew() failed to create a numpy array!" << std::endl;
     return NULL;
   }
   uint* lstdata = (uint*)lst->data;
@@ -1432,55 +1433,83 @@ static PyMemberDef BeamMembers[] = {
   {NULL}
 };
 
+// static PyTypeObject Beam_Type = {
+//     PyVarObject_HEAD_INIT(NULL, 0)
+//     //PyObject_HEAD_INIT(NULL)
+//     //0, /*ob_size*/
+//     "Beam", /*tp_name*/
+//     sizeof(CPPClassObject), /*tp_basicsize*/
+//     0, /*tp_itemsize*/
+//     (destructor) BeamDel, /*tp_dealloc*/
+//     0, /*tp_print*/
+//     0, /*tp_getattr*/
+//     0, /*tp_setattr*/
+//     0, /*tp_compare*/
+//     0, /*tp_repr*/
+//     0, /*tp_as_number*/
+//     0, /*tp_as_sequence*/
+//     0, /*tp_as_mapping*/
+//     0, /*tp_hash */
+//     0, /*tp_call*/
+//     0, /*tp_str*/
+//     0, /*tp_getattro*/
+//     0, /*tp_setattro*/
+//     0, /*tp_as_buffer*/
+//     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+//     beam_init__doc__, /* tp_doc */
+//     0, /* tp_traverse */
+//     0, /* tp_clear */
+//     0, /* tp_richcompare */
+//     0, /* tp_weaklistoffset */
+//     0, /* tp_iter */
+//     0, /* tp_iternext */
+//     BeamMethods, /* tp_methods */
+//     BeamMembers, /* tp_members */
+//     0, /* tp_getset */
+//     0, /* tp_base */
+//     0, /* tp_dict */
+//     0, /* tp_descr_get */
+//     0, /* tp_descr_set */
+//     0, /* tp_dictoffset */
+//     (initproc) BeamInit, /* tp_init */
+//     0, /* tp_alloc */
+//     BeamNew, /* tp_new */
+// };
+
 static PyTypeObject Beam_Type = {
-    PyObject_HEAD_INIT(NULL)
-    0, /*ob_size*/
-    "Beam", /*tp_name*/
-    sizeof(CPPClassObject), /*tp_basicsize*/
-    0, /*tp_itemsize*/
-    (destructor) BeamDel, /*tp_dealloc*/
-    0, /*tp_print*/
-    0, /*tp_getattr*/
-    0, /*tp_setattr*/
-    0, /*tp_compare*/
-    0, /*tp_repr*/
-    0, /*tp_as_number*/
-    0, /*tp_as_sequence*/
-    0, /*tp_as_mapping*/
-    0, /*tp_hash */
-    0, /*tp_call*/
-    0, /*tp_str*/
-    0, /*tp_getattro*/
-    0, /*tp_setattro*/
-    0, /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    beam_init__doc__, /* tp_doc */
-    0, /* tp_traverse */
-    0, /* tp_clear */
-    0, /* tp_richcompare */
-    0, /* tp_weaklistoffset */
-    0, /* tp_iter */
-    0, /* tp_iternext */
-    BeamMethods, /* tp_methods */
-    BeamMembers, /* tp_members */
-    0, /* tp_getset */
-    0, /* tp_base */
-    0, /* tp_dict */
-    0, /* tp_descr_get */
-    0, /* tp_descr_set */
-    0, /* tp_dictoffset */
-    (initproc) BeamInit, /* tp_init */
-    0, /* tp_alloc */
-    BeamNew, /* tp_new */
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "Beam", /*tp_name*/
+    .tp_basicsize = sizeof(CPPClassObject), /*tp_basicsize*/
+    .tp_itemsize = 0, /*tp_itemsize*/
+    .tp_dealloc = (destructor) BeamDel, /*tp_dealloc*/
+    .tp_flags = (Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE), /*tp_flags*/
+    .tp_doc = beam_init__doc__, /* tp_doc */
+    .tp_methods = BeamMethods, /* tp_methods */
+    .tp_members = BeamMembers, /* tp_members */
+    .tp_init =(initproc) BeamInit, /* tp_init */
+    .tp_new = (newfunc)BeamNew, /* tp_new */
 };
 
 PyMODINIT_FUNC initBeam(PyObject* module)
 {
+  int objectSize = sizeof(CPPClassObject);
   import_array();
-  if(PyType_Ready(&Beam_Type) < 0) return;
+  if(PyType_Ready(&Beam_Type) < 0) return NULL;
   Py_INCREF(&Beam_Type);
   PyModule_AddObject(module, "Beam", (PyObject*)&Beam_Type);
 }
+
+// PyMODINIT_FUNC initBeam(PyObject* module)
+// {
+//   int objectSize = sizeof(CPPClassObject);
+//   import_array();
+//   if(PyType_Ready(&Beam_Type) < 0) return NULL;
+//   CPPClassObject *base = PyObject_New(CPPClassObject, &Beam_Type);
+//     Beam* beam = (Beam*)(base->cpp_obj); 
+// 
+//   Py_INCREF(&Beam_Type);
+//   PyModule_AddObject(module, "Beam", (PyObject*)&Beam_Type);
+// }
 
 
 #ifdef _cplusplus

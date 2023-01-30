@@ -39,13 +39,12 @@ class Db_bl():
                        ORDER by NAME"
             cur.execute(db_query)
             results = [] #view index, name, elem_length (m)
-            all_tables = map(lambda t: t[0], cur.fetchall())            
+            all_tables = [t[0] for t in cur.fetchall()]            
             for tblname in all_tables:
                 # get column names each table in list
                 if tblname in bl_elem_list:
                     tbl_query = "SELECT * FROM %s " % tblname
-                    col_names = list(map(lambda x: x[0], 
-                                     cur.execute(tbl_query).description))
+                    col_names = list([x[0] for x in cur.execute(tbl_query).description])
                     # if view_index present than this is part of actual beamline 
                     if 'view_index' in col_names:
                         if tblname == 'dipole':
@@ -65,8 +64,8 @@ class Db_bl():
                         else:
                             # other tables that may store length directly
                             # get name of actual length field
-                            len_name = filter((lambda x: x.find('length') > -1), 
-                                              col_names)
+                            len_name = list(filter((lambda x: x.find('length') > -1), 
+                                              col_names))
                             if len(len_name) > 0:
                                 item = len_name[0]
                                 # read view index, name and length from table
@@ -75,7 +74,7 @@ class Db_bl():
                                                                          tblname)
                                 cur.execute(tbl_query)
                                 temp_table = cur.fetchall()
-                                table = list(map(lambda x: list(x), temp_table))
+                                table = list([list(x) for x in temp_table])
                                 results += table
 
                             else:

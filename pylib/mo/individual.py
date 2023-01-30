@@ -1,7 +1,7 @@
 # individual.py
 
 import sys, random
-import config
+from . import config
 
 def equal_to(o1, o2):
     deadband = abs(o1)*0.0001
@@ -54,7 +54,7 @@ class Solution:
         self.objectives_personal_best = []
         self.variables_personal_best = []
         self.constraint_violation_personal_best = 0.0 
-        self.rank = sys.maxint
+        self.rank = sys.maxsize
         self.distance = 0.0
         
     def evaluate(self):
