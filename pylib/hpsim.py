@@ -2217,7 +2217,7 @@ def _plot_iso_phase_space(ax, u_coor, v_coor, labels=None, nbins=50):
 #            poly.set_edgecolor('white')
     poly.set_alpha(0.75)
 
-    ax.add_collection3d(poly, zs=v_bins, zdir='y')
+    ax.add_collection3d(poly, zs=v_bins[0:-1], zdir='y')
 
     ax.set_xlabel(u_label)
     ax.set_xlim3d(u_bins[0],u_bins[-1])
@@ -2252,7 +2252,7 @@ def _plot_surf_phase_space(ax, u_coor, v_coor, labels=None, nbins=100, limits=No
 
     ps_histo, u_bins, v_bins = np.histogram2d(y=v_coor, x=u_coor, bins=nbins, \
                                               range = [[min_x, max_x], [min_y, max_y]],\
-                                              normed=False) #True)
+                                              density=False) #True)
     ps_histo = ps_histo.T
 
     ZMAX = float(np.max(ps_histo))
@@ -2296,7 +2296,7 @@ def _plot_hist2d(axPS, u_vals, v_vals, labels=None, nbins=100, limits=None):
 
     ps_histo, u_bins, v_bins = np.histogram2d(y=v_vals, x=u_vals, bins=nbins, \
                                               range = [[min_x, max_x], [min_y, max_y]],\
-                                              normed=True)
+                                              density=True)
     ps_histo = ps_histo.T
 
     # mask zeros so they are not plotted
